@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grade 2 CogAT-Style Digital Practice Test</title>
+<style>
+:root{--ink:#172033;--muted:#596579;--line:#d7deea;--paper:#fff;--bg:#f3f6fb;--blue:#244f9e;--soft:#eaf0fc;--green:#e8f6ee;--red:#fff0ed}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Arial,Helvetica,sans-serif}
+header{background:#fff;border-bottom:1px solid var(--line);padding:24px 18px}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+h1{margin:0 0 8px;font-size:clamp(1.6rem,4vw,2.25rem)}h2{font-size:1.35rem;margin:0 0 8px}h3{font-size:1.1rem;margin:0 0 12px}
+p{margin:8px 0}.muted{color:var(--muted)}.notice{background:#fff8df;border:1px solid #ecdca0;border-radius:12px;padding:12px 14px;margin:16px 0}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:16px 0}
+button,select{font:inherit;border-radius:10px;border:1px solid var(--line);padding:10px 14px;background:white;color:var(--ink)}
+button{cursor:pointer;font-weight:700}button.primary{background:var(--blue);color:white;border-color:var(--blue)}button:disabled{opacity:.5;cursor:not-allowed}
+.progress{height:9px;background:#e1e7f0;border-radius:99px;overflow:hidden;flex:1;min-width:120px}.bar{height:100%;width:0;background:var(--blue);transition:width .2s}
+#test{display:grid;gap:16px;margin:18px 0 28px}.section{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;scroll-margin-top:12px}
+.section-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}.tag{font-size:.82rem;color:var(--blue);background:var(--soft);border-radius:999px;padding:4px 9px;font-weight:700}
+.question{border-top:1px solid #e8ecf3;padding:15px 0 12px}.question:first-of-type{border-top:0}.qtext{font-weight:700;margin-bottom:10px}.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.choice{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px;cursor:pointer;min-height:44px}
+.choice:has(input:checked){background:var(--soft);border-color:var(--blue)}.choice input{margin-top:5px;accent-color:var(--blue);flex-shrink:0}
+.choice .letter{font-weight:700;min-width:20px}.choice .txt{flex:1}
+.results{display:none;background:white;border:2px solid var(--blue);border-radius:16px;padding:20px;margin:20px 0 30px}.results.show{display:block}
+.score-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}
+.score-card{background:#f6f8fc;border:1px solid var(--line);border-radius:12px;padding:14px}.score{font-size:1.6rem;font-weight:800}
+.feedback{margin-top:10px;border-radius:8px;padding:10px}.correct{background:var(--green)}.incorrect{background:var(--red)}
+.answer-review{display:none;margin-top:18px}.answer-review.show{display:block}.review-item{padding:10px 0;border-top:1px solid var(--line)}
+footer{padding:10px 0 36px;color:var(--muted);font-size:.9rem}
+@media(max-width:650px){.choices{grid-template-columns:1fr}.score-grid{grid-template-columns:1fr}.section{padding:14px}}
+@media print{body{background:white}.toolbar,button,.progress,.notice{display:none!important}.section{break-inside:avoid;border:1px solid #999}.choice{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<h1>Grade 2 CogAT-Style Digital Practice Test</h1>
+<p class="muted">Original practice questions • 9 sections • 54 questions • Select one answer per question</p>
+<div class="notice"><strong>Practice mode:</strong> The answer key stays hidden until you submit. This is an original learning resource, not an official CogAT test or a prediction of school placement.</div>
+<div class="toolbar">
+<label for="mode"><strong>Practice plan:</strong></label>
+<select id="mode" aria-label="Choose practice mode">
+<option value="all">Full test — all 9 sections</option>
+<option value="verbal">Verbal battery only</option>
+<option value="quantitative">Quantitative battery only</option>
+<option value="nonverbal">Nonverbal battery only</option>
+</select>
+<button id="resetBtn" type="button">Reset answers</button>
+<div class="progress" aria-label="Completion progress"><div class="bar" id="progressBar"></div></div>
+<span id="progressText" class="muted">0 of 54 answered</span>
+</div>
+</div></header>
+<main class="wrap">
+<div id="test" aria-live="polite"></div>
+<div class="toolbar">
+<button class="primary" id="submitBtn" type="button">Submit answers and see scores</button>
+<button id="backBtn" type="button">Back to unanswered</button>
+</div>
+<div id="results" class="results" tabindex="-1" aria-live="polite"></div>
+<footer>
+<p><strong>Adult note:</strong> For a child in Grade 2, consider short sessions of 10–15 minutes and talk about reasoning strategies. A missed answer is a learning opportunity, not a label.</p>
+<p>Chicago Public Schools procedures and testing windows may vary by program and school year. Confirm current details with your child's school.</p>
+</footer>
+</main>
+<script>
+const SECTIONS = [{"id": "V1", "battery": "Verbal", "name": "Picture / Verbal Analogies", "questions": [["Bird is to nest as bee is to…", ["Hive", "Web", "Pond", "Cave"], 0, "A nest is a bird’s home; a hive is a bee’s home."], ["Puppy is to dog as foal is to…", ["Goat", "Horse", "Sheep", "Deer"], 1, "A puppy is a young dog; a foal is a young horse."], ["Glove is to hand as mitten is to…", ["Foot", "Head", "Hand", "Knee"], 2, "Both a glove and a mitten are worn on a hand."], ["Book is to reading as fork is to…", ["Drawing", "Eating", "Writing", "Sleeping"], 1, "A book is used for reading; a fork is used for eating."], ["Calf is to cow as chick is to…", ["Duck", "Hen", "Bird nest", "Feather"], 1, "A calf is a young cow; a chick can be a young hen/chicken."], ["Thermometer is to temperature as ruler is to…", ["Weight", "Length", "Time", "Sound"], 1, "A thermometer measures temperature; a ruler measures length."]]}, {"id": "V2", "battery": "Verbal", "name": "Verbal Classification", "questions": [["Which word does not belong with the others?", ["Rose", "Tulip", "Daisy", "Oak"], 3, "Rose, tulip, and daisy are flowers; oak is a tree."], ["Which word does not belong?", ["Whisper", "Shout", "Speak", "Listen"], 3, "Whisper, shout, and speak are ways to produce speech; listen is receiving sound."], ["Which group belongs together best?", ["Copper, iron, gold", "Cloud, rain, snow", "Chair, table, carrot", "Monday, pencil, Friday"], 0, "Copper, iron, and gold are metals."], ["Which one is different?", ["Minute", "Hour", "Second", "Meter"], 3, "Minute, hour, and second measure time; meter measures length."], ["Which word does not belong?", ["Triangle", "Rectangle", "Cube", "Circle"], 2, "Triangle, rectangle, and circle are flat shapes; a cube is a solid."], ["Which three belong together?", ["Sparrow, robin, eagle", "Salmon, whale, trout", "Lizard, frog, snake", "Ant, spider, worm"], 0, "Sparrow, robin, and eagle are all birds."]]}, {"id": "V3", "battery": "Verbal", "name": "Verbal Relationships and Inference", "questions": [["Maya put on boots and carried an umbrella before going outside. What is most likely?", ["It may be rainy", "It is bedtime", "She is going swimming", "It is very hot indoors"], 0, "Boots and an umbrella suggest wet weather."], ["All the glims in a story are blue. Nori is a glim. What must be true?", ["Nori is blue", "Nori is tall", "All blue things are glims", "Nori is a bird"], 0, "If every glim is blue and Nori is a glim, Nori is blue."], ["Which word completes the relationship? Tiny is to small as enormous is to…", ["Narrow", "Huge", "Quiet", "Short"], 1, "Enormous means very large, like huge."], ["A chef uses a recipe. A builder most often uses a…", ["Map", "Blueprint", "Calendar", "Poem"], 1, "A blueprint guides a builder, as a recipe guides a chef."], ["Lena is older than Kai. Kai is older than Bo. Who is youngest?", ["Lena", "Kai", "Bo", "Cannot tell"], 2, "The order is Lena, then Kai, then Bo."], ["Which sentence gives the best reason a plant near a sunny window grew well?", ["It received sunlight", "It was next to a book", "Its pot was round", "The room had a clock"], 0, "Sunlight helps plants grow."]]}, {"id": "Q1", "battery": "Quantitative", "name": "Number Analogies", "questions": [["2 is to 4 as 5 is to…", ["7", "8", "10", "12"], 2, "The second number is double the first."], ["3 is to 6 as 4 is to…", ["7", "8", "9", "12"], 1, "Multiply by 2."], ["10 is to 7 as 8 is to…", ["3", "5", "6", "11"], 2, "Subtract 3."], ["2 is to 5 as 4 is to…", ["6", "7", "8", "9"], 1, "Add 3."], ["12 is to 6 as 18 is to…", ["3", "6", "9", "12"], 2, "Divide by 2."], ["4 is to 9 as 6 is to…", ["10", "11", "12", "15"], 1, "Add 5."]]}, {"id": "Q2", "battery": "Quantitative", "name": "Number Series", "questions": [["What comes next? 3, 6, 9, 12, …", ["13", "14", "15", "18"], 2, "Add 3 each time."], ["What comes next? 2, 4, 8, 16, …", ["18", "24", "30", "32"], 3, "Double each number."], ["What comes next? 21, 18, 15, 12, …", ["11", "10", "9", "8"], 2, "Subtract 3 each time."], ["Find the missing number: 4, 7, 11, 16, …", ["20", "21", "22", "23"], 1, "Add 3, then 4, then 5, so next add 6."], ["What comes next? 1, 4, 9, 16, …", ["20", "24", "25", "36"], 2, "These are square numbers: 1, 4, 9, 16, 25."], ["What comes next? 30, 27, 23, 18, …", ["12", "13", "14", "15"], 1, "Subtract 3, 4, 5, then 6."]]}, {"id": "Q3", "battery": "Quantitative", "name": "Quantitative Relations", "questions": [["A box has 4 red tiles and 3 blue tiles. How many tiles are there altogether?", ["6", "7", "8", "9"], 1, "4 + 3 = 7."], ["Sam has 15 marbles. He gives 4 away and then gets 2 more. How many now?", ["11", "12", "13", "17"], 2, "15 − 4 + 2 = 13."], ["Three bags hold 5 apples each. How many apples altogether?", ["8", "10", "15", "20"], 2, "Three groups of five make 15."], ["A number is greater than 20 but less than 25. It is even and has a 2 in the ones place. What is it?", ["21", "22", "23", "24"], 1, "22 is even and between 20 and 25."], ["There are 4 children. Each has 2 pencils. How many pencils are there?", ["6", "8", "10", "12"], 1, "4 groups of 2 make 8."], ["A toy costs 8 coins. You have 13 coins. After buying it, how many coins remain?", ["4", "5", "6", "7"], 1, "13 − 8 = 5."]]}, {"id": "N1", "battery": "Nonverbal", "name": "Figure Classification", "questions": [["Which symbol does not belong?  ○  ○  △  ○", ["First circle", "Second circle", "Triangle", "Fourth circle"], 2, "The triangle is the only shape that is not a circle."], ["Which one is different?", ["▲", "▲", "△", "▲"], 2, "The third triangle is outline-only; the others are filled."], ["Which shape has no corners?", ["Square", "Triangle", "Circle", "Rectangle"], 2, "A circle has no corners."], ["Which is the odd one out?", ["Small square", "Large square", "Small circle", "Small triangle"], 1, "This item is intentionally more difficult: three shapes are small except the large square."], ["Which shape is a solid object rather than a flat shape?", ["Circle", "Rectangle", "Triangle", "Cube"], 3, "A cube is three-dimensional."], ["Which group contains only shapes with straight sides?", ["Circle, oval, square", "Triangle, square, pentagon", "Oval, triangle, circle", "Circle, rectangle, oval"], 1, "Triangle, square, and pentagon all have straight sides."]]}, {"id": "N2", "battery": "Nonverbal", "name": "Figure Matrices and Patterns", "questions": [["Complete the pattern: ○ △ ○ △ __", ["○", "△", "□", "☆"], 0, "The circle and triangle alternate."], ["Complete the pattern: ▲ ▲ ● ▲ ▲ ● __", ["▲", "●", "■", "○"], 0, "Repeat two triangles, then a circle."], ["Complete the pattern: □, ○, □□, ○○, □□□, …", ["○○○", "□□□□", "○□○", "□□○"], 0, "The shape alternates while the count increases."], ["A row has 1 dot, then 3 dots, then 5 dots. How many dots should the next group have?", ["6", "7", "8", "9"], 1, "The number of dots increases by 2."], ["Which comes next? ↑, →, ↓, …", ["↑", "←", "↗", "↓"], 1, "The arrow turns a quarter-turn clockwise each time."], ["Pattern: small circle, large circle, small square, large square, …", ["Small triangle", "Large triangle", "Small circle", "Large square"], 0, "Repeat each shape small then large, moving to the next shape."]]}, {"id": "N3", "battery": "Nonverbal", "name": "Spatial Visualization", "questions": [["A paper arrow points up. It turns one quarter-turn clockwise. Which way does it point?", ["↑", "→", "↓", "←"], 1, "A quarter-turn clockwise from up points right."], ["A square is turned upside down. What shape is it still?", ["Triangle", "Square", "Circle", "Pentagon"], 1, "Turning a square does not change its shape."], ["Which arrow points in the opposite direction of ←?", ["↑", "→", "↓", "↖"], 1, "The opposite direction is right."], ["Imagine folding a paper in half once, then opening it. How many matching halves were made by the fold?", ["1", "2", "3", "4"], 1, "One fold divides the paper into two halves."], ["A shape is flipped left-to-right. Which feature stays the same?", ["Its size", "Its left-right orientation", "Its location on the page", "The direction it points"], 0, "A flip preserves the size."], ["A square tile has a dot in its top-left corner. If the tile turns one quarter-turn clockwise, where does the dot move?", ["Top right", "Bottom right", "Bottom left", "Top left"], 0, "The top-left corner moves to the top-right after a clockwise quarter-turn."]]}];
+const letters = ["A","B","C","D"];
+const answers = {};
+let submitted = false;
+const testEl = document.getElementById("test");
+const resultsEl = document.getElementById("results");
+const modeEl = document.getElementById("mode");
+const progressBar = document.getElementById("progressBar");
+const progressText = document.getElementById("progressText");
+function selectedSections(){
+ const mode=modeEl.value;
+ if(mode==="all") return SECTIONS;
+ const battery=mode==="verbal"?"Verbal":mode==="quantitative"?"Quantitative":"Nonverbal";
+ return SECTIONS.filter(s=>s.battery===battery);
+}
+function render(){
+ submitted=false; resultsEl.className="results"; resultsEl.innerHTML="";
+ const chosen=selectedSections();
+ testEl.innerHTML="";
+ chosen.forEach(section=>{
+  const sec=document.createElement("section");sec.className="section";sec.id="sec-"+section.id;
+  const head=document.createElement("div");head.className="section-head";
+  const title=document.createElement("div");title.innerHTML=`<h2>${section.name}</h2><div class="muted">${section.questions.length} questions</div>`;
+  const tag=document.createElement("span");tag.className="tag";tag.textContent=section.battery+" battery";
+  head.append(title,tag);sec.append(head);
+  section.questions.forEach((q,i)=>{
+   const key=section.id+"-"+i;
+   const article=document.createElement("div");article.className="question";article.id="q-"+key;
+   const qtext=document.createElement("div");qtext.className="qtext";qtext.textContent=`${i+1}. ${q[0]}`;article.append(qtext);
+   const choices=document.createElement("div");choices.className="choices";
+   q[1].forEach((opt,j)=>{
+    const lab=document.createElement("label");lab.className="choice";
+    const inp=document.createElement("input");inp.type="radio";inp.name=key;inp.value=String(j);inp.checked=answers[key]===j;inp.addEventListener("change",()=>{answers[key]=j;updateProgress();if(submitted) renderResults(false);});
+    const letter=document.createElement("span");letter.className="letter";letter.textContent=letters[j]+".";
+    const txt=document.createElement("span");txt.className="txt";txt.textContent=opt;
+    lab.append(inp,letter,txt);choices.append(lab);
+   });
+   article.append(choices);sec.append(article);
+  });
+  testEl.append(sec);
+ });
+ updateProgress();
+}
+function currentQuestionRefs(){
+ return selectedSections().flatMap(s=>s.questions.map((q,i)=>({section:s,index:i,key:s.id+"-"+i,q})));
+}
+function updateProgress(){
+ const refs=currentQuestionRefs();const count=refs.filter(r=>answers[r.key]!==undefined).length;
+ progressBar.style.width=(refs.length?count/refs.length*100:0)+"%";
+ progressText.textContent=`${count} of ${refs.length} answered`;
+}
+function renderResults(scroll=true){
+ const refs=currentQuestionRefs();
+ const batteries=["Verbal","Quantitative","Nonverbal"];
+ const counts={};batteries.forEach(b=>counts[b]={right:0,total:0});
+ refs.forEach(r=>{counts[r.section.battery].total++;if(answers[r.key]===r.q[2])counts[r.section.battery].right++;});
+ const totalRight=refs.filter(r=>answers[r.key]===r.q[2]).length;
+ const unanswered=refs.filter(r=>answers[r.key]===undefined).length;
+ resultsEl.innerHTML="";
+ const h=document.createElement("h2");h.textContent="Your practice results";resultsEl.append(h);
+ const p=document.createElement("p");p.textContent=`Score: ${totalRight} out of ${refs.length} (${Math.round(totalRight/refs.length*100)}%). ${unanswered?unanswered+" question(s) unanswered.":"Every question has an answer."}`;resultsEl.append(p);
+ const grid=document.createElement("div");grid.className="score-grid";
+ batteries.forEach(b=>{
+  if(!counts[b].total)return;
+  const card=document.createElement("div");card.className="score-card";
+  const label=document.createElement("div");label.className="muted";label.textContent=b+" battery";
+  const score=document.createElement("div");score.className="score";score.textContent=`${counts[b].right}/${counts[b].total}`;
+  const pct=document.createElement("div");pct.textContent=`${Math.round(counts[b].right/counts[b].total*100)}% correct`;
+  card.append(label,score,pct);grid.append(card);
+ });resultsEl.append(grid);
+ const note=document.createElement("p");note.className="muted";note.textContent="Scores are for practice only. They are not official CogAT scores.";resultsEl.append(note);
+ const toggle=document.createElement("button");toggle.type="button";toggle.textContent="Show answer review";resultsEl.append(toggle);
+ const review=document.createElement("div");review.className="answer-review";review.id="review";
+ toggle.addEventListener("click",()=>{review.classList.toggle("show");toggle.textContent=review.classList.contains("show")?"Hide answer review":"Show answer review";});
+ refs.forEach(r=>{
+  const correct=r.q[2],given=answers[r.key];
+  const item=document.createElement("div");item.className="review-item";
+  const title=document.createElement("strong");title.textContent=`${r.section.name} — Question ${r.index+1}: `;
+  const status=document.createElement("span");status.className="feedback "+(given===correct?"correct":"incorrect");status.textContent=given===correct?"Correct":`Correct answer: ${letters[correct]}. ${r.q[1][correct]}${given===undefined?" (not answered)":""}`;
+  const expl=document.createElement("p");expl.className="muted";expl.textContent=r.q[3];
+  item.append(title,status,expl);review.append(item);
+ });
+ resultsEl.append(review);resultsEl.classList.add("show");
+ if(scroll)resultsEl.scrollIntoView({behavior:"smooth",block:"start"});
+}
+document.getElementById("submitBtn").addEventListener("click",()=>{
+ submitted=true;renderResults(true);
+});
+document.getElementById("resetBtn").addEventListener("click",()=>{
+ if(confirm("Clear all selected answers for this test?")){Object.keys(answers).forEach(k=>delete answers[k]);render();}
+});
+document.getElementById("backBtn").addEventListener("click",()=>{
+ const first=currentQuestionRefs().find(r=>answers[r.key]===undefined);
+ if(first){document.getElementById("q-"+first.key)?.scrollIntoView({behavior:"smooth",block:"center"});}
+ else alert("All questions in this practice mode have an answer.");
+});
+modeEl.addEventListener("change",render);
+render();
+</script>
+</body>
+</html>

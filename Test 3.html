@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CogAT-Style Challenge Test (9 Sections)</title>
+<style>
+:root{--bg:#fffaf0;--card:#fff;--tx:#222;--ac:#3b6fd4;--ok:#2e9e5b;--bad:#d64545;--bd:#d9d9d9;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1d22;--card:#262a31;--tx:#f0f0f0;--ac:#7aa2f7;--ok:#4cc38a;--bad:#ff7b7b;--bd:#454a52}}
+:root[data-theme="dark"]{--bg:#1b1d22;--card:#262a31;--tx:#f0f0f0;--ac:#7aa2f7;--ok:#4cc38a;--bad:#ff7b7b;--bd:#454a52}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:18px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:12px}
+h1{font-size:1.4rem;margin:8px 0 4px}p.s{margin:0 0 10px;opacity:.75;font-size:.9rem}
+button{font:inherit;color:inherit;cursor:pointer}
+nav,.bar{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.t,.bar button,.go{padding:10px 14px;border:2px solid var(--bd);border-radius:12px;background:var(--card)}
+.t.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.go{background:var(--ac);color:#fff;border-color:var(--ac);width:100%;font-size:1.1rem;margin:12px 0}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin:10px 0}
+.q{font-size:1.25rem;margin:0 0 8px;font-weight:600}
+.os{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.o{min-height:52px;font-size:1.3rem;padding:8px;border:2px solid var(--bd);border-radius:12px;background:var(--bg)}
+.o.sel{border-color:var(--ac);background:var(--ac);color:#fff}
+.o.ok{border-color:var(--ok);background:var(--ok);color:#fff}
+.o.bad{border-color:var(--bad);background:var(--bad);color:#fff}
+.sc{font-size:1.4rem;text-align:center;padding:12px;border-radius:14px;background:var(--card);border:2px solid var(--ok)}
+label{display:block;font-size:.8rem;margin-top:6px;opacity:.8}
+input{width:100%;box-sizing:border-box;font:inherit;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx)}
+.x{float:right;border:0;background:none}
+</style></head><body><main>
+<h1>🧠 Challenge Test: All 9 CogAT Sections</h1>
+<p class="s">Tap the best answer, then press Check. A grown-up can read the questions aloud.</p>
+<div id="app"></div>
+</main>
+<script>
+const E=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+let D={
+S1:{n:"💬 Sentences",q:[
+["The explorer was ___ about the dark cave, so he brought a flashlight.","cautious","careless","sleepy","cheerful"],
+["Because the road was slippery, the driver went very ___.","slowly","quickly","loudly","happily"],
+["The soup was too hot, so we had to wait for it to ___.","cool","boil","spill","grow"],
+["A thermometer is used to measure ___.","temperature","weight","distance","time"],
+["Even though the mouse was small, it was very ___ when it escaped the trap.","clever","enormous","slow","noisy"],
+["The flowers began to wilt because nobody ___ them.","watered","painted","counted","sang to"],
+["Unlike his noisy brother, Sam was very ___.","quiet","loud","angry","tall"],
+["The scientist ___ the plant every day to see how fast it grew.","measured","borrowed","forgot","hid"]]},
+S2:{n:"🧩 Classify words",q:[
+["Which goes with: violin, guitar, piano?","drum","paint","table","spoon"],
+["Which goes with: Monday, Friday, Sunday?","Wednesday","August","winter","morning"],
+["Which goes with: triangle, circle, square?","rectangle","ball","box","wheel"],
+["Which goes with: oak, maple, pine?","birch","rose","grass","leaf"],
+["Which goes with: whisper, shout, mumble?","yell","jump","listen","quiet"],
+["Which goes with: Mars, Venus, Jupiter?","Saturn","Moon","Sun","comet"],
+["Which does NOT belong: mitten, scarf, sandal, hat?","sandal","mitten","scarf","hat"],
+["Which does NOT belong: lion, tiger, wolf, cheetah?","wolf","lion","tiger","cheetah"]]},
+S3:{n:"🔗 Word analogies",q:[
+["puppy : dog :: kitten : ?","cat","milk","tiger","mouse"],
+["pilot : airplane :: driver : ?","bus","road","wheel","key"],
+["finger : hand :: toe : ?","foot","shoe","knee","sock"],
+["teacher : school :: doctor : ?","hospital","medicine","patient","book"],
+["sad : cry :: happy : ?","laugh","sleep","frown","walk"],
+["page : book :: petal : ?","flower","tree","bee","garden"],
+["tall : short :: wide : ?","narrow","big","long","far"],
+["bake : oven :: freeze : ?","freezer","kitchen","cold","ice"]]},
+S4:{n:"➗ Number analogies",q:[
+["3 : 12 :: 5 : ?","20","17","15","25"],
+["20 : 10 :: 12 : ?","6","8","24","2"],
+["7 : 10 :: 15 : ?","18","20","22","16"],
+["30 : 20 :: 18 : ?","8","10","12","28"],
+["5 : 15 :: 7 : ?","21","17","22","12"],
+["8 : 4 :: 14 : ?","7","6","10","28"],
+["1 : 10 :: 3 : ?","30","13","6","33"],
+["50 : 25 :: 30 : ?","15","20","5","60"]]},
+S5:{n:"📈 Number series",q:[
+["2, 5, 8, 11, ?","14","13","15","12"],
+["1, 2, 4, 7, 11, ?","16","15","14","18"],
+["3, 6, 12, 24, ?","48","30","36","27"],
+["2, 4, 3, 5, 4, ?","6","5","3","8"],
+["1, 4, 9, 16, ?","25","20","24","36"],
+["5, 5, 10, 10, 15, ?","15","20","25","10"],
+["21, 18, 15, 12, ?","9","10","8","6"],
+["1, 1, 2, 3, 5, ?","8","7","6","9"]]},
+S6:{n:"❓ Number puzzles",q:[
+["If 🔺 + 🔺 = 12, what is 🔺?","6","4","3","24"],
+["If ⭐ + 5 = 13, what is ⭐ × 2?","16","8","26","13"],
+["I add 6 to my secret number and get 15. What is my number?","9","21","8","10"],
+["Mia has 3 bags with 4 marbles in each. How many marbles in all?","12","7","10","16"],
+["Which number makes both true? ? + 3 = 10 and 12 − ? = 5","7","5","6","8"],
+["There are 20 children. 8 are boys. How many are girls?","12","10","28","14"],
+["Which is the biggest? 6 + 6, 5 + 8, 4 + 7, 3 + 7","5 + 8","6 + 6","4 + 7","3 + 7"],
+["Half of a number is 9. What is the number?","18","4","12","13"]]},
+S7:{n:"🔷 Figure matrices",q:[
+["Row 1: 🔴 → 🔴🔴. Row 2: 🟦 → ?","🟦🟦","🟦","🔴🔴","🟦🟦🟦"],
+["🔺 🔻 🔺 🔻 🔺 ?","🔻","🔺","🔵","⬆️"],
+["🔵⚪ / ⚪🔵 / 🔵⚪ / ?","⚪🔵","🔵⚪","🔵🔵","⚪⚪"],
+["🔴 small → 🔴 BIG. 🔵 small → ?","🔵 BIG","🔴 BIG","🔵 small","🟢 BIG"],
+["⬆️ ➡️ ⬇️ ⬅️ ⬆️ ➡️ ?","⬇️","⬅️","⬆️","➡️"],
+["🟥 🟦 🟦 🟥 🟦 🟦 🟥 ?","🟦","🟥","🟩","🟨"],
+["1🔴 → 2🔵 → 3🔴 → ?","4🔵","4🔴","3🔵","2🔴"],
+["⭐ → ⭐🌙 → ⭐⭐🌙🌙 → ?","⭐⭐⭐🌙🌙🌙","⭐⭐⭐🌙🌙","⭐🌙","🌙🌙🌙"]]},
+S8:{n:"🗂️ Figure classify",q:[
+["Which belongs with 🍎 🔴 ❤️ ?","🍓","🍌","🌿","🌊"],
+["Which does NOT belong? ⬆️ ⬇️ ⬅️ ➡️ 🔺","🔺","⬆️","⬇️","➡️"],
+["Which belongs with 🟥 🟧 🟨 ?","🟩","🔺","⭐","🔵"],
+["Which does NOT belong? 🔵⚪ 🔴⚪ 🟢⚪ 🟡🟡","🟡🟡","🔵⚪","🔴⚪","🟢⚪"],
+["Which belongs with ⬛ ⬜ 🔲 ?","🔳","🔵","🔺","⭐"],
+["Which does NOT belong? 1️⃣ 2️⃣ 3️⃣ 🅰️","🅰️","1️⃣","2️⃣","3️⃣"],
+["Which belongs with 🔵🔵 🔴🔴 🟢🟢 ?","🟡🟡","🟡🔵","🔵🔴","🟢🟡"],
+["Which does NOT belong? 🔺🔺 🔵🔵 🟦🟦🟦 🔴🔴","🟦🟦🟦","🔺🔺","🔵🔵","🔴🔴"]]},
+S9:{n:"📄 Paper folding",q:[
+["Fold in half, then in half again. Punch TWO holes. Unfold. How many holes?","8","4","2","6"],
+["Fold in half. Punch 3 holes. Unfold. How many holes?","6","3","4","9"],
+["Fold in half. Punch a hole as far from the fold as you can. After unfolding, the two holes are ___.","far apart","close together","in the same spot","missing"],
+["Fold in half. Cut a small triangle out of the fold edge. Unfold. What shape is the hole?","diamond","triangle","circle","square"],
+["Fold in half 3 times. Punch ONE hole. Unfold. How many holes?","8","3","6","4"],
+["Fold a square corner to corner to make a triangle. Punch one hole in the middle. How many holes after unfolding?","2","1","3","4"],
+["Fold in half. Cut a small square out of the fold edge. Unfold. What is the hole?","a rectangle","a small square","a circle","a triangle"],
+["Fold in half. Punch 1 hole close to the fold and 1 far from it. How many holes after unfolding?","4","2","3","1"]]}};
+const DEF=JSON.stringify(D);
+try{const s=localStorage.getItem("cogat3");if(s)D=JSON.parse(s)}catch(e){}
+let k="S1",edit=false,ans={},done={},ord={};
+const sh=a=>{a=[...a];for(let i=a.length;i>1;){const j=Math.floor(Math.random()*i--);[a[i],a[j]]=[a[j],a[i]]}return a};
+function fresh(){ans={};done={};ord={};for(const b in D)ord[b]=D[b].q.map(q=>sh(q.slice(1).filter(Boolean)))}
+function save(){try{localStorage.setItem("cogat3",JSON.stringify(D))}catch(e){}}
+function render(){
+ const y=scrollY,q=D[k].q;
+ let h="<nav>"+Object.keys(D).map(b=>`<button class="t ${b==k?"on":""}" onclick="go('${b}')">${D[b].n}</button>`).join("")+"</nav>";
+ h+=`<div class="bar"><button onclick="tog()">${edit?"✅ Done editing":"✏️ Edit questions"}</button>`+(edit?`<button onclick="add()">➕ Add question</button><button onclick="rst()">↩ Restore original</button>`:`<button onclick="fresh();render()">🔄 New try</button>`)+"</div>";
+ if(edit){
+  h+=q.map((x,i)=>`<div class="c"><b>${i+1}</b><button class="x" onclick="del(${i})">🗑</button>`+["Question","✅ Correct answer","Wrong answer 1","Wrong answer 2","Wrong answer 3"].map((l,f)=>`<label>${l}<input value="${E(x[f]||"")}" onchange="upd(${i},${f},this.value)"></label>`).join("")+"</div>").join("");
+ }else{
+  const a=ans[k]||(ans[k]={});
+  if(done[k]){const s=q.filter((x,i)=>a[i]===x[1]).length;h+=`<div class="sc">⭐ ${s} out of ${q.length} correct!</div>`}
+  h+=q.map((x,i)=>`<div class="c"><p class="q">${i+1}. ${E(x[0])}</p><div class="os">`+ord[k][i].map((o,j)=>`<button class="o ${a[i]===o?"sel":""} ${done[k]?(o===x[1]?"ok":a[i]===o?"bad":""):""}" onclick="pick(${i},${j})">${E(o)}</button>`).join("")+"</div></div>").join("");
+  if(!done[k])h+=`<button class="go" onclick="done[k]=true;render();scrollTo(0,0)">Check answers (${Object.keys(a).length}/${q.length} answered)</button>`;
+ }
+ document.getElementById("app").innerHTML=h;scrollTo(0,y);
+}
+function go(b){k=b;edit=false;render()}
+function tog(){edit=!edit;if(!edit)fresh();render()}
+function pick(i,j){if(done[k])return;ans[k][i]=ord[k][i][j];render()}
+function upd(i,f,v){D[k].q[i][f]=v;save()}
+function add(){D[k].q.push(["New question","Correct","Wrong","Wrong","Wrong"]);save();render();scrollTo(0,document.body.scrollHeight)}
+function del(i){D[k].q.splice(i,1);save();render()}
+function rst(){D=JSON.parse(DEF);try{localStorage.removeItem("cogat3")}catch(e){}fresh();render()}
+fresh();render();
+</script></body></html>
